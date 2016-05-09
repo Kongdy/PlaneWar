@@ -49,7 +49,7 @@ public class StartView extends BasicSurfaceView {
 
 	@Override
 	public void surfaceDestroyed(SurfaceHolder holder) {
-		
+		super.surfaceDestroyed(holder);
 	}
 
 	@Override

@@ -49,6 +49,11 @@ public abstract class BasicSurfaceView extends SurfaceView implements Callback2 
 	}
 	
 	@Override
+	public void surfaceDestroyed(SurfaceHolder holder) {
+		refreshFlag = false;
+	}
+	
+	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
 		renderUIThread = new RenderUIThread(); // 界面绘制线程
 		refreshFlag = true;// 开启界面刷新
