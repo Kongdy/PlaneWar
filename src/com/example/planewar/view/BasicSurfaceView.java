@@ -13,6 +13,7 @@ import android.view.SurfaceView;
 public abstract class BasicSurfaceView extends SurfaceView implements Callback2 {
 	
 	public boolean refreshFlag; // 界面刷新开关
+	private RenderUIThread renderUIThread;
 
 	SurfaceHolder sfh;
 
@@ -20,6 +21,9 @@ public abstract class BasicSurfaceView extends SurfaceView implements Callback2 
 		super(context);
 		sfh = this.getHolder();
 		sfh.addCallback(this);
+		initPaint(); // 初始化画笔
+		initEntity(); // 初始化对象
+		initTouch(); // 初始化点击事件
 	}
 	
 	// UI绘制线程
@@ -44,6 +48,17 @@ public abstract class BasicSurfaceView extends SurfaceView implements Callback2 
 		}
 	}
 	
+	@Override
+	public void surfaceCreated(SurfaceHolder holder) {
+		renderUIThread = new RenderUIThread(); // 界面绘制线程
+		refreshFlag = true;// 开启界面刷新
+		// 界面刷新线程
+		renderUIThread.start();
+	}
+	
 	public abstract void myDraw(Canvas canvas);
 	public abstract void backgroundOp();
+	abstract void initPaint();
+	abstract void initEntity();
+	abstract void initTouch();
 }

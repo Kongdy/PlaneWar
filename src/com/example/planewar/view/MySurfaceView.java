@@ -55,30 +55,26 @@ public class MySurfaceView extends BasicSurfaceView {
 	private MonsterBornThread monsterBornThread; // 怪物生成类
 
 	private boolean monsterOpen; // 是否生成怪物
-	
-	// Bullet bullet; // 子弹
-	// Bullet bullet2; // 子弹2
 
 	public MySurfaceView(Context context) {
 		super(context);
 		this.context = context;
 		entitys = new ArrayList<EntityFather>();
-		initPaint(); // 初始化画笔
-		initEntity(); // 初始化对象
-		initTouch(); // 初始化点击事件
 	}
 
 	/**
 	 * 初始化点击绑定
 	 */
-	private void initTouch() {
+	@Override
+	void initTouch() {
 		plane.isCanAutoMove = false; // 飞机默认开始未被点击
 	}
 
 	/**
 	 * 初始化对象
 	 */
-	private void initEntity() {
+	@Override
+	 void initEntity() {
 		plane = new Plane(context);
 		plane.x = Utils.SCREENWIDTH_ / 2;
 		plane.y = Utils.SCREENHEIGHT_ - 300 - plane.getHeight();
@@ -93,15 +89,18 @@ public class MySurfaceView extends BasicSurfaceView {
 	/**
 	 * 初始化画笔
 	 */
-	private void initPaint() {
+	@Override
+	void initPaint() {
 		// 飞机画笔
 		paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+		paint.setAntiAlias(true); // 防锯齿
 		// paint.setDither(true);
 		// paint.setFilterBitmap(true);
 		// 分数画笔
 		scorePaint = new Paint();
 		scorePaint.setTextSize(100); // 设置文字大小
 		scorePaint.setColor(Color.RED);
+		scorePaint.setAntiAlias(true);
 		bg1 = 0;
 		bg2 = bg1 - Utils.SCREENHEIGHT_;
 	}
@@ -147,12 +146,9 @@ public class MySurfaceView extends BasicSurfaceView {
 
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
-		renderUIThread = new RenderUIThread(); // 界面绘制线程
+		super.surfaceCreated(holder);
 		monsterBornThread = new MonsterBornThread(); // 怪物生成线程
-		refreshFlag = true;// 开启界面刷新
 		monsterOpen = true; // 开启怪物
-		// 界面刷新线程
-		renderUIThread.start();
 		monsterBornThread.start();
 	}
 
