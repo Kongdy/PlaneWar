@@ -14,11 +14,13 @@ public abstract class BasicSurfaceView extends SurfaceView implements Callback2 
 	
 	public boolean refreshFlag; // 界面刷新开关
 	private RenderUIThread renderUIThread;
+	protected Context context;
 
 	SurfaceHolder sfh;
 
 	public BasicSurfaceView(Context context) {
 		super(context);
+		this.context = context;
 		sfh = this.getHolder();
 		sfh.addCallback(this);
 		initPaint(); // 初始化画笔

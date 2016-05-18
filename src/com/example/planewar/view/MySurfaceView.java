@@ -33,8 +33,6 @@ import com.example.planewar.tools.Utils;
  */
 public class MySurfaceView extends BasicSurfaceView {
 
-	private Context context;
-
 	List<EntityFather> entitys;
 
 	private Plane plane; // ·É»ú
@@ -58,8 +56,6 @@ public class MySurfaceView extends BasicSurfaceView {
 
 	public MySurfaceView(Context context) {
 		super(context);
-		this.context = context;
-		entitys = new ArrayList<EntityFather>();
 	}
 
 	/**
@@ -75,6 +71,9 @@ public class MySurfaceView extends BasicSurfaceView {
 	 */
 	@Override
 	 void initEntity() {
+		if(entitys == null) {
+			entitys = new ArrayList<EntityFather>();
+		}
 		plane = new Plane(context);
 		plane.x = Utils.SCREENWIDTH_ / 2;
 		plane.y = Utils.SCREENHEIGHT_ - 300 - plane.getHeight();

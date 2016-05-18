@@ -1,10 +1,13 @@
 package com.example.planewar.Entity;
 
+import com.example.planewar.tools.Utils;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.view.MotionEvent;
 import android.view.View.OnTouchListener;
 
 /**
@@ -69,6 +72,20 @@ public abstract class EntityFather implements OnTouchListener {
 		this.newWidth = width;
 		this.newHeight = height;
 	}
+	
+	/**
+	 * 根据所给占屏幕大小比例改变空间高度和宽度
+	 * 
+	 * @param width
+	 * @param height
+	 */
+	public void changeSize(double widthRate, double heightRate) {
+		if(widthRate > 1.0 || widthRate < 0.0 || heightRate > 1.0 || heightRate < 0.0) {
+			throw new IllegalArgumentException("heightRate and widthRate max is 1.0 and min is 0.0");
+		}
+		this.newWidth = (int) (width*widthRate);
+		this.newHeight = (int) (height*heightRate);
+	}
 
 	public int getHeight() {
 		return height;
@@ -126,7 +143,7 @@ public abstract class EntityFather implements OnTouchListener {
 
 			if (newWidth != 0 && newHeight != 0 && width != newWidth
 					&& height != newHeight) {
-				option.inSampleSize = width / newWidth < height / newHeight ? width
+				option.inSampleSize = width / newWidth > height / newHeight ? width
 						/ newWidth
 						: height / newHeight;
 			}
@@ -201,6 +218,41 @@ public abstract class EntityFather implements OnTouchListener {
 		}
 		return bitmap;
 	};
+	
+	/**
+	 * 水平居中显示,并且根据比例调整位于屏幕高度的位置
+	 * @param canvas
+	 * @param heightRate 值在0.0到1.0之间，表示高度比率，0代表屏幕底部
+	 * 									value is between 0.0 and 0.0,as height rate,0 is top
+	 * @param paint
+	 * @return
+	 */
+	public Bitmap drawSelf(Canvas canvas, float heightRate, Paint paint) {
+		if(width > Utils.SCREENWIDTH_) {
+			width = (Utils.SCREENWIDTH_/10)*9;
+		}
+		if(height >= Utils.SCREENHEIGHT_) {
+			height = Utils.SCREENHEIGHT_/2;
+		}
+		if(heightRate > 1 || heightRate < 0) {
+			throw new IllegalArgumentException("heightRate max is 1.0 and min is 0.0");
+		}
+		y = Utils.SCREENHEIGHT_*heightRate-height;
+		x = (Utils.SCREENWIDTH_-width)/2;
+		getParams(canvas, x, y, paint);
+		if(bitmap == null && this.y > 0) {
+			if(!createBitmap.isAlive()) {
+				createBitmap.start();
+			}
+		}
+		if(bitmap != null) {
+			drawBitmap();
+		}
+		if(isCanAutoMove) {
+			move();
+		}
+		return bitmap;
+	};
 
 	public abstract void move();
 	/**
@@ -230,6 +282,20 @@ public abstract class EntityFather implements OnTouchListener {
 				}
 			}
 		}
+	}
+	
+	/**
+	 * 触摸点是否在该实体内
+	 * @return
+	 */
+	public boolean isInArea(MotionEvent event) {
+		final float x = event.getX();
+		final float y = event.getY();
+		if(x >=  this.x && x <= this.x+width && 
+				y >=  this.y && y <= this.y+height ) {
+			return true;
+		}
+		return false;
 	}
 
 }
