@@ -4,22 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import android.app.Dialog;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
-import android.view.SurfaceHolder.Callback2;
-import android.view.SurfaceView;
-import android.widget.TextView;
 
 import com.example.planewar.R;
-import com.example.planewar.Entity.Bullet;
+import com.example.planewar.Entity.Boss;
 import com.example.planewar.Entity.EntityFather;
 import com.example.planewar.Entity.GuaiWuFather;
 import com.example.planewar.Entity.GuaiwuRank1;
@@ -47,12 +43,13 @@ public class MySurfaceView extends BasicSurfaceView {
 	private Bitmap background2;// 背景2
 
 	private CopyOnWriteArrayList<GuaiWuFather> guaiwus = new CopyOnWriteArrayList<GuaiWuFather>(); // 怪物集合
-
-	
-	private RenderUIThread renderUIThread;
 	private MonsterBornThread monsterBornThread; // 怪物生成类
 
 	private boolean monsterOpen; // 是否生成怪物
+	private long monsterTime = 1000l;
+	private boolean isHaveBoss = false;
+	
+	private int level = 1;
 
 	public MySurfaceView(Context context) {
 		super(context);
@@ -92,9 +89,6 @@ public class MySurfaceView extends BasicSurfaceView {
 	void initPaint() {
 		// 飞机画笔
 		paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-		paint.setAntiAlias(true); // 防锯齿
-		// paint.setDither(true);
-		// paint.setFilterBitmap(true);
 		// 分数画笔
 		scorePaint = new Paint();
 		scorePaint.setTextSize(100); // 设置文字大小
@@ -117,7 +111,7 @@ public class MySurfaceView extends BasicSurfaceView {
 				canvas.drawBitmap(background1, 0, bg1, paint);
 				canvas.drawBitmap(background2, 0, bg2, paint);
 			} else {
-				canvas.drawColor(Color.RED);
+				canvas.drawColor(Color.BLACK);
 			}
 			canvas.drawText(plane.score + "", 50, 100, scorePaint);
 			if (plane != null && plane.isAlive) {
@@ -133,6 +127,9 @@ public class MySurfaceView extends BasicSurfaceView {
 					}
 					if(g instanceof GuaiwuRank2) {
 						GuaiwuRank1.currentCount--;
+					}
+					if(g instanceof Boss) {
+						isHaveBoss = false;
 					}
 					guaiwus.remove(g);
 				}
@@ -167,10 +164,9 @@ public class MySurfaceView extends BasicSurfaceView {
 	public void surfaceRedrawNeeded(SurfaceHolder holder) {
 	}
 
-	/**
-	 * 接收来自界面的触摸分发事件
-	 */
-	public void handleTouch(MotionEvent event) {
+	@SuppressLint("ClickableViewAccessibility")
+	@Override
+	public boolean onTouchEvent(MotionEvent event) {
 		float touchX = event.getRawX();
 		float touchY = event.getRawY();
 		switch (event.getAction()) {
@@ -197,6 +193,7 @@ public class MySurfaceView extends BasicSurfaceView {
 		default:
 			break;
 		}
+		return true;
 	}
 
 	/**
@@ -215,24 +212,46 @@ public class MySurfaceView extends BasicSurfaceView {
 		public void run() {
 			while (monsterOpen) {
 				try {
-					sleep(1000l);
+					sleep(monsterTime);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-				if (GuaiwuRank1.currentCount < GuaiwuRank1.sumCount) {
-					GuaiwuRank1 monster1 = new GuaiwuRank1(getContext());
-					monster1.x = randomX();
-					monster1.y = 0;
-					guaiwus.add(monster1);
-					GuaiwuRank1.currentCount++;
+				if(!isHaveBoss) {
+					if (GuaiwuRank1.currentCount < GuaiwuRank1.sumCount) {
+						GuaiwuRank1 monster1 = new GuaiwuRank1(getContext());
+						monster1.x = randomX();
+						monster1.y = 0;
+						guaiwus.add(monster1);
+						GuaiwuRank1.currentCount++;
+					}
+					if(GuaiwuRank1.currentCount%2 == 0 && GuaiwuRank2.currentCount < GuaiwuRank2.sumCount) {
+						GuaiwuRank2 monster2 = new GuaiwuRank2(getContext());
+						monster2.x = randomX();
+						monster2.y = 0;
+						guaiwus.add(monster2);
+						GuaiwuRank2.currentCount++;
+					}
 				}
-				if(GuaiwuRank1.currentCount%2 == 0 && GuaiwuRank2.currentCount < GuaiwuRank2.sumCount) {
-					GuaiwuRank2 monster2 = new GuaiwuRank2(getContext());
-					monster2.x = randomX();
-					monster2.y = 0;
-					guaiwus.add(monster2);
-					GuaiwuRank2.currentCount++;
+				if(level != plane.getUpdateLevel()) {
+					level = plane.getUpdateLevel();
+					switch (level) {
+					case 2:
+						plane.bulletlevel = 4;
+						monsterTime = 500l;
+						if(!isHaveBoss) {
+							Boss boss = new Boss(context, R.drawable.bossplane, 50000);
+							boss.x = Utils.SCREENWIDTH_/2-boss.width;
+							boss.y = 0;
+							boss.score = 5000;
+							guaiwus.add(boss);
+							isHaveBoss = true;
+						}
+						break;
+					default:
+						break;
+					}
 				}
+				
 			}
 		}
 	}
@@ -274,6 +293,11 @@ public class MySurfaceView extends BasicSurfaceView {
 	@Override
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
 		super.onSizeChanged(w, h, oldw, oldh);
+	}
+	
+	@Override
+	public void clear() {
+		refreshFlag = false;
 	}
 
 }

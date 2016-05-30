@@ -1,5 +1,7 @@
 package com.example.planewar.view;
 
+import com.example.planewar.MainActivity;
+
 import android.content.Context;
 import android.graphics.Canvas;
 import android.view.SurfaceHolder.Callback2;
@@ -15,12 +17,14 @@ public abstract class BasicSurfaceView extends SurfaceView implements Callback2 
 	public boolean refreshFlag; // 界面刷新开关
 	private RenderUIThread renderUIThread;
 	protected Context context;
+	public MainActivity mainActivity;
 
 	SurfaceHolder sfh;
 
 	public BasicSurfaceView(Context context) {
 		super(context);
 		this.context = context;
+		this.mainActivity = (MainActivity) context;
 		sfh = this.getHolder();
 		sfh.addCallback(this);
 		initPaint(); // 初始化画笔
@@ -42,7 +46,7 @@ public abstract class BasicSurfaceView extends SurfaceView implements Callback2 
 				if (endTime - startTime < 50) { // 控制屏幕帧数在20帧以下
 					try {
 						Thread.sleep(50 - (endTime - startTime));
-					} catch (InterruptedException e) {
+					} catch (InterruptedException e) {	
 						e.printStackTrace();
 					}
 				}
@@ -68,4 +72,5 @@ public abstract class BasicSurfaceView extends SurfaceView implements Callback2 
 	abstract void initPaint();
 	abstract void initEntity();
 	abstract void initTouch();
+	abstract void clear();
 }

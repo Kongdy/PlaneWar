@@ -24,8 +24,8 @@ public class Bullet extends EntityFather {
 	public int shootDamage; // 射击产生的伤害
 	public int shootSpeed; // 单位间隔时间内所移动的距离，即速度
 	
-	public Bullet(Context context) {
-		super(context,R.drawable.zidan,1,1);
+	public Bullet(Context context,int bulletType) {
+		super(context,bulletType,1,1);
 		isAlive = true;
 		isCanAutoMove = true;
 	}

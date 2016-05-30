@@ -3,6 +3,7 @@ package com.example.planewar.view;
 import com.example.planewar.R;
 import com.example.planewar.Entity.EntityFather;
 import com.example.planewar.Entity.ShowGoods;
+import com.example.planewar.common.ConstantUtils;
 import com.example.planewar.tools.Utils;
 
 import android.content.Context;
@@ -11,9 +12,9 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.os.Message;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
-import android.view.ViewGroup;
 
 /**
  * 开始界面
@@ -32,15 +33,12 @@ public class StartView extends BasicSurfaceView {
 	private EntityFather mLogo;
 	private EntityFather mStartBtn;
 	
-	private StartViewDoListener listener;
-
 	public StartView(Context context) {
 		super(context);
 	}
 
 	@Override
 	public void surfaceRedrawNeeded(SurfaceHolder holder) {
-		
 	}
 
 	@Override
@@ -99,9 +97,9 @@ public class StartView extends BasicSurfaceView {
 		switch (event.getAction() & MotionEvent.ACTION_MASK) {
 		case MotionEvent.ACTION_DOWN:
 			if(mStartBtn.isInArea(event)) {
-				if(listener != null) {
-					listener.startDo();
-				}
+				Message msg = new Message();
+				msg.what = ConstantUtils.TO_PLAY_VIEW;
+				mainActivity.getHandler().sendMessage(msg);
 			}
 			break;
 		default:
@@ -118,28 +116,16 @@ public class StartView extends BasicSurfaceView {
 		mStartBtn = new ShowGoods(context, R.drawable.game_start_btn);
 		mLogo.changeSize(200, 100);
 		mStartBtn.changeSize(150, 30);
-		//planeWarMain = new MySurfaceView(context);
 	}
 
 	@Override
 	void initTouch() {
 	}
-	
-	public void setListener(StartViewDoListener listener) {
-		this.listener = listener;
-	}
-	
-	/**
-	 * 点击开始按钮要做的事情
-	 */
-	public interface StartViewDoListener{
-		public void startDo();
-	}
-	
 	/**
 	 * 停止
 	 */
-	public void stop() {
+	@Override
+	public void clear() {
 		refreshFlag = false;
 	}
 

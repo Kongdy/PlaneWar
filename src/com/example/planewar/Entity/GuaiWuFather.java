@@ -24,11 +24,11 @@ public abstract class GuaiWuFather extends EntityFather {
 	
 	public int bloodValue; // 血量
 	
-	private boolean portrait; // 帧方向
+	protected boolean portrait; // 帧方向
 	
 	public int score; // 死亡可获分数
 	
-	private DestorySelf destorySelf; // 毁灭程序
+	protected DestorySelf destorySelf; // 毁灭程序
 
 	public GuaiWuFather(Context context, int iconResId,int currentFrame,boolean portrait,int totalFrame) {
 		super(context, iconResId,totalFrame,currentFrame);
@@ -78,6 +78,10 @@ public abstract class GuaiWuFather extends EntityFather {
 		} else {
 			this.isAlive = false;
 		}
+	}
+	
+	public void setCurrentFrame(int currentFrame) {
+		this.currentFrame = currentFrame;
 	}
 	
 }

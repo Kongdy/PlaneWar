@@ -24,6 +24,7 @@ public class Plane extends EntityFather {
 	private BulletThread bt;
 	private DestorySelf destoryself;
 	public int score; // 获得的分数
+	private int UpdateLevel = 1;
 
 	public int bulletlevel;
 
@@ -101,7 +102,7 @@ public class Plane extends EntityFather {
 						if (guaiwu instanceof GuaiwuRank2) {
 						}
 						guaiwu.bloodValue = guaiwu.bloodValue - b.shootDamage; // 减血
-						if (guaiwu.bloodValue < 0) {
+						if (guaiwu.bloodValue <= 0) {
 							b.isCanAutoMove = false;
 							guaiwu.isCanAutoMove = false;
 							guaiwu.isExplosion = true;
@@ -123,6 +124,15 @@ public class Plane extends EntityFather {
 				bullets.remove(b);
 			}
 		}
+		if(this.score >= 500 && this.score < 100000) {
+			UpdateLevel = 2;
+		} else if(this.score >= 100000) {
+			UpdateLevel = 3;
+		}
+	}
+	
+	public int getUpdateLevel() {
+		return UpdateLevel;
 	}
 
 	// 子弹自动发射线程
@@ -135,9 +145,12 @@ public class Plane extends EntityFather {
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-
+				int bulletType = R.drawable.zidan;
+				if(bulletlevel == 4) {
+					bulletType = R.drawable.bullet2;
+				}
 				for (int i = 0; i < bulletlevel; i++) {
-					Bullet bullet = new Bullet(context);
+					Bullet bullet = new Bullet(context,bulletType);
 					if (i%2 == 0 || i ==0) {
 						bullet.x = Plane.this.x + (2 * Plane.this.width) / 3;
 						bullet.y = Plane.this.y + Plane.this.height / 4;

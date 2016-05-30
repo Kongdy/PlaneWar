@@ -99,9 +99,12 @@ public abstract class EntityFather implements OnTouchListener {
 	 * 改变资源文件id
 	 */
 	public void changeIconResId(int iconResId) {
+		option.inJustDecodeBounds = true;
 		this.iconResId = iconResId;
 		bitmap = BitmapFactory.decodeResource(context.getResources(),
 				iconResId, option);
+		width = option.outWidth;
+		height = option.outHeight;
 	}
 
 	/**
@@ -140,7 +143,6 @@ public abstract class EntityFather implements OnTouchListener {
 	public class CreateBitmap extends Thread {
 		@Override
 		public void run() {
-
 			if (newWidth != 0 && newHeight != 0 && width != newWidth
 					&& height != newHeight) {
 				option.inSampleSize = width / newWidth > height / newHeight ? width
@@ -184,7 +186,7 @@ public abstract class EntityFather implements OnTouchListener {
 		}
 		canvas.restore();
 	}
-
+	
 	/**
 	 * 返回位图x坐标，即相对屏幕左框的像素距离
 	 * 
